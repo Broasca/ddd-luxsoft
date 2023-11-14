@@ -1,0 +1,19 @@
+
+###> symfony/framework-bundle ###
+/.idea/*
+/vendor/*
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/*
+###< symfony/framework-bundle ###
+
+/docker/mongodb/data/*
+/docker/mysql/data/*
+/docker/ssh
+/site/files/*
+/site/.env
+/site/public/bundles

@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+    # PHP service
+    app:
+        build: ./docker/php/.
+        container_name: app-php
+        working_dir: /var/www/site
+        volumes:
+            - ./:/var/www/site
+            - ./docker/php/php.ini:/usr/local/etc/php/conf.d/docker-php-ext-intl.ini
+            - ./docker/ssh/:/root/.ssh
+        networks:
+            - app-network
+    # Nginx service
+    nginx:
+        image: nginx:alpine
+        container_name: app-nginx
+        working_dir: /var/www/site
+        ports:
+            - 8001:80
+        volumes:
+            - ./:/var/www/site
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - app-network
+
+    # Mysql service
+    mysql:
+        image: mysql:8.0
+        platform: linux/x86_64
+        container_name: app-mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            - MYSQL_DATABASE=dev
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=app
+            - MYSQL_PASSWORD=apppass
+        volumes:
+            - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./docker/mysql/data:/var/lib/mysql
+        ports:
+            - 8982:3306
+        networks:
+            - app-network
+networks:
+    app-network:
+        driver: bridge
