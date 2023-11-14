@@ -7,6 +7,7 @@
 
 namespace App\Controller;
 
+use App\DependencyInjection\UserServiceDI;
 use App\Entity\User;
 use App\Form\RegisterFormType;
 use App\Form\RegistrationFormType;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class SecurityController extends AbstractController
 {
+    use UserServiceDI;
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -50,28 +53,20 @@ class SecurityController extends AbstractController
 
         if ($request->isMethod(Request::METHOD_POST)) {
             $email = $request->request->get('email');
-            $user = $entityManager->getRepository(User::class)->findOneByEmail($email);
-            if ($user) {
-                $this->addFlash('warning', 'Email already exists.');
+            $plaintextPassword = $request->get('password');
+
+            try {
+                $user = $this->userService->register($email, $plaintextPassword);
+                return $userAuthenticator->authenticateUser(
+                    $user,
+                    $authenticator,
+                    $request
+                );
+            } catch (\Exception $exception) {
+                $this->addFlash('warning', $exception->getMessage());
                 return $this->render('security/register.html.twig', []);
             }
-            $user = new User();
-            $user->setEmail($email);
-            $plaintextPassword = $request->get('password');
-            $hashedPassword = $userPasswordHasher->hashPassword(
-                $user,
-                $plaintextPassword
-            );
-            $user->setPassword($hashedPassword);
-
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            return $userAuthenticator->authenticateUser(
-                $user,
-                $authenticator,
-                $request
-            );
+            return $this->render('security/register.html.twig', []);
         }
 
         return $this->render('security/register.html.twig', []);

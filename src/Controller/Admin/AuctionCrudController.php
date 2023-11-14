@@ -7,20 +7,23 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\User;
+use App\Entity\Auction;
+use App\Entity\Item;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class UserCrudController extends AbstractCrudController
+class AuctionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return User::class;
+        return Auction::class;
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -34,31 +37,26 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $id = IdField::new('id');
-        $email = TextField::new('email');
-        $fullName = TextField::new('fullName');
-        $type = ChoiceField::new('type')->setChoices([
-            User::TYPE_SELLER => User::TYPE_SELLER,
-            User::TYPE_BUYER  => User::TYPE_BUYER,
+        $name = TextField::new('name');
+        $description = CodeEditorField::new('description')->setNumOfRows(5);
+        $initialPrice = IntegerField::new('item.initialPrice');
+        $item = AssociationField::new('item');
+        $owner = AssociationField::new('owner');
+        $status = ChoiceField::new('status')->setChoices([
+            Item::STATUS_ACTIVE   => Item::STATUS_ACTIVE,
+            Item::STATUS_INACTIVE => Item::STATUS_INACTIVE,
+            Item::STATUS_LOCKED   => Item::STATUS_LOCKED,
         ])->autocomplete();
-        $lastLogin = DateTimeField::new('lastLogin');
-        $lastIp = TextField::new('lastIp');
-        $companies = AssociationField::new('companies');
-        $shippingAddress = TextField::new('shippingAddress');
-        $billingAddress = TextField::new('billingAddress');
-        $creditCardInfo = TextField::new('creditCardInfo');
-
+        $endDate = DateTimeField::new('endDate');
 
         $index = $new = $edit = $detail = [
-            $email,
-            $fullName,
-            $email,
-            $type,
-            $lastLogin,
-            $lastIp,
-            $companies,
-            $shippingAddress,
-            $billingAddress,
-            $creditCardInfo,
+            $name,
+            $description,
+            $initialPrice,
+            $item,
+            $owner,
+            $status,
+            $endDate
         ];
         switch ($pageName) {
             case Crud::PAGE_INDEX:

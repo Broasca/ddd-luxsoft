@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Composer\Autoload\ClassLoader;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,6 +13,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
+    const TYPE_SELLER = 'Seller';
+    const TYPE_BUYER  = 'Buyer';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -20,7 +25,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     private ?string $email;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $firstName;
+    private ?string $fullName;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $type;
 
     #[ORM\Column(type: 'string', nullable: false)]
     private string $password;
@@ -33,6 +41,35 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?array $roles;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Company::class)]
+    private $companies;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $shippingAddress;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $billingAddress;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $creditCardInfo;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Item::class)]
+    private $items;
+
+    #[ORM\OneToMany(mappedBy: 'auctions', targetEntity: Auction::class)]
+    private $auctions;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Bid::class)]
+    private $bids;
+
+    public function __construct()
+    {
+        $this->companies = new ArrayCollection();
+        $this->items = new ArrayCollection();
+        $this->auctions = new ArrayCollection();
+        $this->bids = new ArrayCollection();
+    }
 
     public function __toString(): string
     {
@@ -54,24 +91,24 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->email = $email;
     }
 
-    public function getFirstName()
+    public function getFullName(): ?string
     {
-        return $this->firstName;
+        return $this->fullName;
     }
 
-    public function setFirstName($firstName): void
+    public function setFullName(?string $fullName): void
     {
-        $this->firstName = $firstName;
+        $this->fullName = $fullName;
     }
 
-    public function getTasks()
+    public function getType(): ?string
     {
-        return $this->tasks;
+        return $this->type;
     }
 
-    public function setTasks($tasks): void
+    public function setType(?string $type): void
     {
-        $this->tasks = $tasks;
+        $this->type = $type;
     }
 
     public function getPassword(): ?string
@@ -111,16 +148,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->plainPassword = $plainPassword;
     }
 
-    public function getCompany(): Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(Company $company): void
-    {
-        $this->company = $company;
-    }
-
     public function getLastLogin(): ?DateTime
     {
         return $this->lastLogin;
@@ -139,5 +166,75 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     public function setLastIp(?string $lastIp): void
     {
         $this->lastIp = $lastIp;
+    }
+
+    public function getCompanies()
+    {
+        return $this->companies;
+    }
+
+    public function setCompanies($companies): void
+    {
+        $this->companies = $companies;
+    }
+
+    public function getShippingAddress(): ?string
+    {
+        return $this->shippingAddress;
+    }
+
+    public function setShippingAddress(?string $shippingAddress): void
+    {
+        $this->shippingAddress = $shippingAddress;
+    }
+
+    public function getBillingAddress(): ?string
+    {
+        return $this->billingAddress;
+    }
+
+    public function setBillingAddress(?string $billingAddress): void
+    {
+        $this->billingAddress = $billingAddress;
+    }
+
+    public function getCreditCardInfo(): ?string
+    {
+        return $this->creditCardInfo;
+    }
+
+    public function setCreditCardInfo(?string $creditCardInfo): void
+    {
+        $this->creditCardInfo = $creditCardInfo;
+    }
+
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    public function setItems($items): void
+    {
+        $this->items = $items;
+    }
+
+    public function getAuctions(): ArrayCollection
+    {
+        return $this->auctions;
+    }
+
+    public function setAuctions(ArrayCollection $auctions): void
+    {
+        $this->auctions = $auctions;
+    }
+
+    public function getBids(): ArrayCollection
+    {
+        return $this->bids;
+    }
+
+    public function setBids(ArrayCollection $bids): void
+    {
+        $this->bids = $bids;
     }
 }

@@ -7,6 +7,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Bid;
+use App\Entity\Company;
+use App\Entity\Item;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -14,13 +17,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class UserCrudController extends AbstractCrudController
+class BidCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return User::class;
+        return Bid::class;
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -34,31 +38,21 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $id = IdField::new('id');
-        $email = TextField::new('email');
-        $fullName = TextField::new('fullName');
-        $type = ChoiceField::new('type')->setChoices([
-            User::TYPE_SELLER => User::TYPE_SELLER,
-            User::TYPE_BUYER  => User::TYPE_BUYER,
+        $amount = IntegerField::new('amount');
+        $createdAt = DateTimeField::new('createdAt');
+        $user = AssociationField::new('user');
+        $auction = AssociationField::new('auction');
+        $status = ChoiceField::new('status')->setChoices([
+            Bid::STATUS_APPROVED     => Bid::STATUS_APPROVED,
+            Bid::STATUS_NOT_APPROVED => Bid::STATUS_NOT_APPROVED,
         ])->autocomplete();
-        $lastLogin = DateTimeField::new('lastLogin');
-        $lastIp = TextField::new('lastIp');
-        $companies = AssociationField::new('companies');
-        $shippingAddress = TextField::new('shippingAddress');
-        $billingAddress = TextField::new('billingAddress');
-        $creditCardInfo = TextField::new('creditCardInfo');
-
 
         $index = $new = $edit = $detail = [
-            $email,
-            $fullName,
-            $email,
-            $type,
-            $lastLogin,
-            $lastIp,
-            $companies,
-            $shippingAddress,
-            $billingAddress,
-            $creditCardInfo,
+            $amount,
+            $createdAt,
+            $user,
+            $auction,
+            $status,
         ];
         switch ($pageName) {
             case Crud::PAGE_INDEX:

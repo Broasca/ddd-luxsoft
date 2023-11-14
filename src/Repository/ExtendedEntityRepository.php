@@ -23,14 +23,14 @@ abstract class ExtendedEntityRepository extends ServiceEntityRepository
 		parent::__construct($registry, $this->getEntityNameFromRepositoryName());
 	}
 
-    public function find($id, $lockMode = null, $lockVersion = null)
-    {
-        if ($id === null) {
-            return null;
-        }
-
-        return parent::find($id, $lockMode, $lockVersion);
-    }
+//    public function find($id, $lockMode = null, $lockVersion = null)
+//    {
+//        if ($id === null) {
+//            return null;
+//        }
+//
+//        return parent::find($id, $lockMode, $lockVersion);
+//    }
 
     public function getEntityNameFromRepositoryName()
 	{

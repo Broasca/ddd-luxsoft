@@ -7,58 +7,56 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\User;
+use App\Entity\Item;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class UserCrudController extends AbstractCrudController
+class ItemCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return User::class;
+        return Item::class;
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->showEntityActionsInlined()
             ->setDefaultSort(['id' => 'DESC'])
+            ->showEntityActionsInlined()
             ->setPaginatorPageSize(500);
     }
 
     public function configureFields(string $pageName): iterable
     {
         $id = IdField::new('id');
-        $email = TextField::new('email');
-        $fullName = TextField::new('fullName');
-        $type = ChoiceField::new('type')->setChoices([
-            User::TYPE_SELLER => User::TYPE_SELLER,
-            User::TYPE_BUYER  => User::TYPE_BUYER,
+        $name = TextField::new('name');
+        $description = CodeEditorField::new('description')->setNumOfRows(5);
+        $category = ChoiceField::new('category')->setChoices([
+            "Category 1" => "Category 1",
+            "Category 2" => "Category 2",
+            "Category 3" => "Category 3",
         ])->autocomplete();
-        $lastLogin = DateTimeField::new('lastLogin');
-        $lastIp = TextField::new('lastIp');
-        $companies = AssociationField::new('companies');
-        $shippingAddress = TextField::new('shippingAddress');
-        $billingAddress = TextField::new('billingAddress');
-        $creditCardInfo = TextField::new('creditCardInfo');
-
+        $initialPrice = IntegerField::new('initialPrice');
+        $user = AssociationField::new('user');
+        $status = ChoiceField::new('status')->setChoices([
+            Item::STATUS_ACTIVE   => Item::STATUS_ACTIVE,
+            Item::STATUS_INACTIVE => Item::STATUS_INACTIVE,
+            Item::STATUS_LOCKED   => Item::STATUS_LOCKED,
+        ])->autocomplete();
 
         $index = $new = $edit = $detail = [
-            $email,
-            $fullName,
-            $email,
-            $type,
-            $lastLogin,
-            $lastIp,
-            $companies,
-            $shippingAddress,
-            $billingAddress,
-            $creditCardInfo,
+            $name,
+            $description,
+            $category,
+            $initialPrice,
+            $user,
+            $status,
         ];
         switch ($pageName) {
             case Crud::PAGE_INDEX:

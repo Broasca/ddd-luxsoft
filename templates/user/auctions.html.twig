@@ -1,0 +1,34 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <h1>Auctions</h1>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {% for auction in auctions %}
+            <div class="row">
+                <div class="col">
+                    <h2>{{ auction.id }} - {{ auction.name }}</h2>
+                    <hr>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col">
+                    {{ auction.description | raw }}<br>
+                    Intial Price: {{ auction.item.initialPrice | number_format(2, ',', '.') }}<br>
+                    End Date: {{ auction.endDate | date('d/m/Y H:i:s') }}<br>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-success">Bid</button>
+                    <a href="{{ path('user_auction_details', {'auctionId' : auction.id }) }}">View Details</a>
+                </div>
+            </div>
+            <div class="row mb-5">
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
